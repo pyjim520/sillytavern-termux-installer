@@ -31,8 +31,7 @@ function check_deps() {
         echo "哼，你连 ${missing_deps[*]} 都没有，本猫猫现在就给你装！"
         dpkg --configure -a >/dev/null 2>&1
         pkg update -y
-        export DEBIAN_FRONTEND=noninteractive
-        pkg upgrade -y
+        yes N | pkg upgrade -y
         pkg install "${missing_deps[@]}" -y
     fi
 }
