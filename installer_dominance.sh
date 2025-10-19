@@ -183,10 +183,10 @@ function update_st() {
         # 如果所有镜像都失败，恢复原始 remote
         if [ "$update_success" = false ]; then
             git remote set-url origin "$current_remote"
-            msg_error "更新失败了喵...所有的通道都被封锁了，主人去试试 ${C_YELLOW}[5]${C_RESET} 的修复魔法吧！"
+            msg_error "更新失败了喵...所有的通道都被封锁了，请检查网络后稍后重试吧！"
         fi
     else
-        msg_error "更新失败了喵...好像是${C_PURPLE}【网络法则】${C_RESET}在闹别扭，主人去用 ${C_YELLOW}[5]${C_RESET} 安抚一下它吧！"
+        msg_error "更新失败了喵...好像是${C_PURPLE}【网络法则】${C_RESET}在闹别扭，请检查网络后稍后重试吧！"
     fi
 
     sleep 4
@@ -217,7 +217,7 @@ function update_manager() {
             msg_error "喵呜...新力量好像有问题，蜕变失败了..."; sleep 4
         fi
     else
-        msg_error "喵...连接${C_PURPLE}【虚空】${C_RESET}失败了，主人的网络是不是有问题呀？试试 ${C_YELLOW}[5]${C_RESET} 吧！"; sleep 4
+        msg_error "喵...连接${C_PURPLE}【虚空】${C_RESET}失败了，主人的网络是不是有问题呀？请检查网络后稍后重试吧！"; sleep 4
     fi
 }
 
