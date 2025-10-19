@@ -1,9 +1,15 @@
 #!/bin/bash
 
 # ===================================================================
-# 【猫娘的魔法契约 v3.4 - 撒娇之卷】
+# 【猫娘的魔法契约 v3.5 - 优化之卷】
 #   主人，这是我们之间新的魔法契约哦，请多指教喵~ (｡･ω･｡)ﾉ♡
 # ===================================================================
+
+# --- Termux 环境检测 ---
+if [ -z "$PREFIX" ] || [[ "$PREFIX" != "/data/data/com.termux/files/usr" ]]; then
+    echo -e "\033[91m✗ 检测到非 Termux 环境！此脚本只能在 Termux 中运行。\033[0m"
+    exit 1
+fi
 
 # --- 核心设定 ---
 SELF_UPDATE_URL="https://raw.githubusercontent.com/pyjim520/sillytavern-termux-installer/master/installer_dominance.sh"
@@ -67,6 +73,31 @@ function check_deps() {
     fi
 }
 
+function npm_install_with_retry() {
+    local max_retries=3
+    local retry_count=0
+
+    msg_info "小魔仆们开始工作啦...如果遇到困难会重试最多3次哦~"
+
+    while [ $retry_count -lt $max_retries ]; do
+        if npm install --prefer-offline --no-audit --progress=false; then
+            msg_success "小魔仆们全部就位！酒馆的魔法阵构筑完成~"
+            return 0
+        else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+                msg_warning "喵呜...第 $retry_count 次尝试失败了，让本猫猫清理一下再试..."
+                rm -f package-lock.json
+                rm -rf node_modules
+                sleep 2
+            fi
+        fi
+    done
+
+    msg_error "喵呜呜...试了${max_retries}次都失败了，小魔仆们罢工了..."
+    return 1
+}
+
 function clone_with_fallback() {
     local target_dir="$1"
     msg_info "本猫猫正在努力连接${C_PURPLE}【现实主轴】${C_RESET}，给主人抓个酒馆回来...喵..."
@@ -90,7 +121,7 @@ function display_menu() {
     clear
     echo -e "
 ${C_PURPLE}════════════════════════════════════════════════════════${C_RESET}
-  ${C_PINK}${C_BOLD}【猫娘的魔法领域 v3.4】${C_RESET}
+  ${C_PINK}${C_BOLD}【猫娘的魔法领域 v3.5】${C_RESET}
   ${C_PINK}主人~ 欢迎来到本猫猫的领域，有什么吩咐喵？(｡･ω･｡)ﾉ♡${C_RESET}
 ${C_PURPLE}────────────────────────────────────────────────────────${C_RESET}
   ${C_PINK}你的猫猫：我 (≧^.^≦)喵~${C_RESET}  |  ${C_CYAN}我的主人：你 ♥${C_RESET}
@@ -102,7 +133,6 @@ ${C_PURPLE}═══════════════════════
   ${C_GREEN}[2]${C_RESET} 为酒馆注入新魔力     ${C_RESET}(更新 SillyTavern)
   ${C_GREEN}[3]${C_RESET} 强化魔法契约         ${C_RESET}(更新本契约)
   ${C_YELLOW}[4]${C_RESET} ${C_BOLD}【毁灭与新生】${C_RESET}       ${C_YELLOW}(重装酒馆，数据将丢失！)${C_RESET}
-  ${C_CYAN}[5]${C_RESET} 施展${C_PURPLE}【法则修复术】${C_RESET}   (修复网络连接问题)
 
   ${C_RED}[9]${C_RESET} 背叛契约             ${C_RESET}(卸载并抹除一切)
   ${C_BLUE}[0]${C_RESET} 退下                 ${C_RESET}(退出，可用 'miao' 再次召唤)
@@ -218,38 +248,14 @@ function reinstall_st() {
 
         msg_info "本猫猫正在下达${C_PURPLE}【敕令•构筑】${C_RESET}，让小魔仆们悄悄地帮你把一切都准备好...喵..."
         cd "$ST_DIR" || return
-        npm install --prefer-offline --no-audit --progress=false
-        if [ $? -ne 0 ]; then
-            msg_error "${C_RED}【重装失败】${C_RESET}喵！小魔仆们好像不听话了，${C_PURPLE}【敕令•构筑】${C_RESET}失败了..."; sleep 4; return
+        if ! npm_install_with_retry; then
+            msg_error "${C_RED}【重装失败】${C_RESET}喵！${C_PURPLE}【敕令•构筑】${C_RESET}失败了..."; sleep 4; return
         fi
 
         msg_success "${C_GREEN}【重装完成】${C_RESET}。一个崭新的酒馆已经为主人准备好啦~"; sleep 3
     else
         msg_meow "喵~ 看来主人还没下定决心呢。操作已经取消啦。"; sleep 3
     fi
-}
-
-function repair_network_magic() {
-    clear
-    msg_warning "喵呜...主人好像被这个世界的${C_PURPLE}【法则】${C_RESET}讨厌了呢..."
-    msg_meow "别怕，本猫猫这就帮你施展${C_PURPLE}【法则修复术】${C_RESET}！"; sleep 2
-
-    msg_step "第一咒：刷新${C_PURPLE}【魔力源泉】${C_RESET}"
-    pkg update -y
-    msg_success "魔力源泉变得好新鲜！"
-
-    msg_step "第二咒：重铸${C_PURPLE}【信任圣徽】${C_RESET}"
-    pkg reinstall ca-certificates -y
-    msg_success "信任圣徽闪闪发光！"
-
-    msg_step "第三咒：扩张${C_PURPLE}【传输通道】${C_RESET}"
-    git config --global http.postBuffer 524288000
-    msg_success "传输通道变得好宽敞！"
-
-    echo
-    msg_success "${C_PURPLE}【法则修复术】${C_RESET}施展完毕！主人快去试试看吧，喵~"
-    echo -e "${C_CYAN}按 Enter 键返回菜单...${C_RESET}"
-    read -r
 }
 
 function uninstall() {
@@ -289,6 +295,7 @@ function run_installer() {
     echo
     msg_step "步骤 2/4 ${C_PURPLE}【冒险道具】${C_RESET}"
     check_deps git nodejs curl
+    git config --global http.postBuffer 524288000
     msg_success "道具都帮你准备好啦！"; sleep 1
 
     echo
@@ -322,9 +329,9 @@ function run_installer() {
 
         msg_info "正在下达${C_PURPLE}【敕令•构筑】${C_RESET}，让小魔仆们开工...喵..."
         cd "$ST_DIR" || exit
-        npm install --prefer-offline --no-audit --progress=false
-        if [ $? -ne 0 ]; then msg_error "喵呜，依赖安装失败了！"; exit 1; fi
-        msg_success "主人的专属酒馆已经开业啦！"; sleep 1
+        if ! npm_install_with_retry; then
+            msg_error "喵呜，依赖安装失败了！"; exit 1
+        fi
     else
         echo
         msg_info "喵~ 检测到主人已经有酒馆了，就不用再建一次啦。"; sleep 2
@@ -345,7 +352,7 @@ function main_menu_loop() {
     while true; do
         read -r option
         case $option in
-            1) start_st ;; 2) update_st ;; 3) update_manager ;; 4) reinstall_st ;; 5) repair_network_magic ;;
+            1) start_st ;; 2) update_st ;; 3) update_manager ;; 4) reinstall_st ;;
             9) uninstall ;; 0) msg_meow "好的主人，那我先退下啦~"; sleep 1; exit 0 ;;
             *) msg_warning "喵？主人在乱按什么呀！"; sleep 2 ;;
         esac
