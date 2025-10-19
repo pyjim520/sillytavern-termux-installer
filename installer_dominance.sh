@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ===================================================================
-# 【猫娘的魔法契约 v3.3 - 撒娇之卷】
+# 【猫娘的魔法契约 v3.4 - 撒娇之卷】
 #   主人，这是我们之间新的魔法契约哦，请多指教喵~ (｡･ω･｡)ﾉ♡
 # ===================================================================
 
@@ -41,7 +41,7 @@ msg_step() { echo -e "${C_BLUE}${C_BOLD}▶${C_RESET} ${C_BLUE}$*${C_RESET}"; }
 # --- 猫猫的魔法函数 ---
 
 function say_with_delay() {
-    echo -n "$1"; sleep 0.4; echo -n "."; sleep 0.4; echo -n "."; sleep 0.4; echo -n "."; echo " $2"; sleep 1;
+    echo -ne "$1"; sleep 0.4; echo -n "."; sleep 0.4; echo -n "."; sleep 0.4; echo -n "."; echo -e " $2"; sleep 1;
 }
 
 function check_deps() {
@@ -59,7 +59,7 @@ function check_deps() {
     done
 
     if [ ${#missing_deps[@]} -ne 0 ]; then
-        msg_meow "喵~ 主人连 ${C_YELLOW}${missing_deps[*]}${C_RESET}${C_PINK} 都没有呀？真是让人不省心呢。看在本猫猫心情好的份上，就帮你装上吧！哼~${C_RESET}"
+        msg_meow "喵~ 主人连 ${C_YELLOW}${missing_deps[*]}${C_PINK} 都没有呀？真是让人不省心呢。看在本猫猫心情好的份上，就帮你装上吧！哼~"
         dpkg --configure -a >/dev/null 2>&1
         pkg update -y
         yes N | pkg upgrade -y
@@ -90,7 +90,7 @@ function display_menu() {
     clear
     echo -e "
     ${C_PURPLE}╔═══════════════════════════════════════════════════════╗${C_RESET}
-    ${C_PURPLE}║${C_RESET}  ${C_PINK}${C_BOLD}【猫娘的魔法领域 v3.3】${C_RESET}                          ${C_PURPLE}║${C_RESET}
+    ${C_PURPLE}║${C_RESET}  ${C_PINK}${C_BOLD}【猫娘的魔法领域 v3.4】${C_RESET}                          ${C_PURPLE}║${C_RESET}
     ${C_PURPLE}║${C_RESET}  ${C_PINK}主人~ 欢迎来到本猫猫的领域，有什么吩咐喵？(｡･ω･｡)ﾉ♡${C_RESET} ${C_PURPLE}║${C_RESET}
     ${C_PURPLE}╠═══════════════════════════════════════════════════════╣${C_RESET}
     ${C_PURPLE}║${C_RESET}  ${C_PINK}你的猫猫：我 (≧^.^≦)喵~${C_RESET}  |  ${C_CYAN}我的主人：你 ♥${C_RESET}          ${C_PURPLE}║${C_RESET}
