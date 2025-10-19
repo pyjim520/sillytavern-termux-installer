@@ -70,7 +70,7 @@ function check_deps() {
 function clone_with_fallback() {
     local target_dir="$1"
     msg_info "本猫猫正在努力连接${C_PURPLE}【现实主轴】${C_RESET}，给主人抓个酒馆回来...喵..."
-    if git clone --depth=1 "$ST_REPO_URL" "$target_dir" 2>/dev/null; then
+    if git clone --depth=1 "$ST_REPO_URL" "$target_dir"; then
         msg_success "连接成功啦！不愧是本猫猫，一下子就抓到了~！"; return 0
     fi
 
@@ -78,7 +78,7 @@ function clone_with_fallback() {
     for mirror in "${ST_REPO_MIRRORS[@]}"; do
         msg_info "正在${C_PURPLE}【镜像位面】${C_RESET}里悄悄地...悄悄地帮你拿...喵..."
         rm -rf "$target_dir"
-        if git clone --depth=1 "$mirror" "$target_dir" 2>/dev/null; then
+        if git clone --depth=1 "$mirror" "$target_dir"; then
             msg_success "抓到啦！本猫猫最厉害了，对吧？快夸我~ (≧▽≦)"; return 0
         fi
     done
@@ -247,7 +247,9 @@ function repair_network_magic() {
     msg_success "传输通道变得好宽敞！"
 
     echo
-    msg_success "${C_PURPLE}【法则修复术】${C_RESET}施展完毕！主人快去试试看吧，喵~"; sleep 8
+    msg_success "${C_PURPLE}【法则修复术】${C_RESET}施展完毕！主人快去试试看吧，喵~"
+    echo -e "${C_CYAN}按 Enter 键返回菜单...${C_RESET}"
+    read -r
 }
 
 function uninstall() {
